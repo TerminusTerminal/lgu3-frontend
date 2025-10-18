@@ -1,0 +1,180 @@
+.page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: Inter, sans-serif;
+}
+
+.page h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.search-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  padding: 8px 12px;
+  width: 300px;
+  max-width: 90%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.search-container input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(17,82,114,0.4);
+}
+
+.investor-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.investor-form input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  flex: 1;
+  min-width: 180px;
+  transition: all 0.2s ease;
+}
+.investor-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(17,82,114,0.3);
+}
+.investor-form button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.investor-form button:hover {
+  background: #0e3f57;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(17,82,114,0.3);
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 40px;
+}
+
+/* Table */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.table th, .table td {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.table th {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.table tbody tr:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+}
+.actions button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+.edit-btn {
+  background: #0ff;
+}
+.edit-btn:hover {
+  background: #00bcd4;
+}
+.delete-btn {
+  background: #ff4d4f;
+}
+.delete-btn:hover {
+  background: #d9363e;
+}
+
+/* Mobile cards */
+.card-container {
+  display: none;
+}
+.investor-card {
+  display: none;
+  background: #fff;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.investor-card p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+}
+.card-actions button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.card-actions button:first-child {
+  background: #0ff;
+  color: #000;
+}
+.card-actions button:last-child {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .table {
+    display: none;
+  }
+  .card-container {
+    display: block;
+  }
+}
+@media (max-width: 500px) {
+  .investor-form {
+    flex-direction: column;
+  }
+  .investor-form input, .investor-form button {
+    width: 100%;
+  }
+  .search-container input {
+    width: 100%;
+  }
+}

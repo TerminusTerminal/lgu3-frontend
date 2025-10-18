@@ -1,0 +1,132 @@
+.page {
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #111;
+}
+
+h2 {
+  margin-bottom: 16px;
+  font-size: 1.8rem;
+  color: var(--accent, #115272);
+}
+
+.search-container {
+  margin-bottom: 16px;
+}
+
+.search-container input {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.incentive-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.incentive-form input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.incentive-form button {
+  grid-column: 1 / -1;
+  padding: 10px 16px;
+  background: var(--accent, #115272);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.incentive-form button:hover {
+  background: #0d3f5d;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table th, .table td {
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.table th {
+  background: var(--accent, #115272);
+  color: #fff;
+}
+
+.actions button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-btn { background: #4caf50; color: #fff; }
+.delete-btn { background: #f44336; color: #fff; }
+
+.edit-btn:hover { background: #3a9e41; }
+.delete-btn:hover { background: #d32f2f; }
+
+.loading {
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 20px 0;
+}
+
+.card-container {
+  display: none;
+}
+
+.incentive-card {
+  background: #fff;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.incentive-card p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.card-actions button {
+  flex: 1;
+  padding: 6px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 800px) {
+  .table { display: none; }
+  .card-container { display: block; }
+}
