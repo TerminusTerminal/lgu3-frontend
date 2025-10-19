@@ -1,110 +1,218 @@
 .page {
-  padding: 20px;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  color: #111;
+  padding: 2rem;
+  font-family: "Inter", sans-serif;
+  background: #f4f7fa;
+  min-height: 100vh;
 }
 
-h2 {
-  margin-bottom: 16px;
-  font-size: 1.8rem;
-  color: var(--accent, #115272);
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.table-wrapper {
-  overflow-x: auto;
+.page-header h2 {
+  font-size: 2rem;
+  color: #0b3954;
+  font-weight: 700;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.table th, .table td {
-  padding: 10px 12px;
-  border: 1px solid #e0e0e0;
-  text-align: left;
-}
-
-.table th {
-  background: var(--accent, #115272);
-  color: #fff;
-}
-
-.table td {
-  vertical-align: middle;
-}
-
-.actions button {
-  margin-right: 6px;
-  padding: 6px 10px;
-  border-radius: 6px;
+.new-app-btn {
+  background: linear-gradient(90deg, #0b3954, #133f63);
+  color: white;
   border: none;
-  font-size: 0.85rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
+  font-weight: 600;
+  transition: 0.3s;
 }
 
-.actions button:hover {
-  opacity: 0.85;
+.new-app-btn:hover {
+  opacity: 0.9;
 }
 
-.approve-btn {
-  background: #4caf50;
-  color: #fff;
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.8rem;
 }
 
-.reject-btn {
-  background: #f44336;
-  color: #fff;
+.app-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.approve-btn:hover {
-  background: #3a9e41;
+.app-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
 }
 
-.reject-btn:hover {
-  background: #d32f2f;
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.loading {
-  text-align: center;
-  font-size: 1.1rem;
-  margin: 20px 0;
+.app-header h3 {
+  font-size: 1.25rem;
+  color: #115272;
+  font-weight: 600;
 }
 
-.card-container {
-  display: none;
+.status {
+  padding: 0.3rem 0.8rem;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
-.application-card {
-  background: #fff;
-  padding: 14px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
 }
 
-.application-card p {
-  margin: 6px 0;
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.app-card p {
+  margin: 0.35rem 0;
+  color: #333;
   font-size: 0.95rem;
 }
 
-.card-actions {
+.app-actions {
+  margin-top: 1rem;
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
-.card-actions button {
-  flex: 1;
-  padding: 6px;
-  font-size: 0.85rem;
+button.approve {
+  background: #28a745;
+  color: white;
 }
 
-@media (max-width: 800px) {
-  .table { display: none; }
-  .card-container { display: block; }
+button.reject {
+  background: #dc3545;
+  color: white;
+}
+
+button.details {
+  background: #0b3954;
+  color: white;
+}
+
+button.archive {
+  background: #6c757d;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.modal h3 {
+  margin-bottom: 1rem;
+  color: #0b3954;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.modal p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.close-btn,
+.restore-btn,
+.archive {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.65rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.close-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.restore-btn {
+  background: #28a745;
+  color: white;
+}
+
+.archive {
+  background: #dc3545;
+  color: white;
+}
+
+.close-btn:hover,
+.restore-btn:hover,
+.archive:hover {
+  opacity: 0.9;
+}
+
+/* Loading */
+.loading-spinner {
+  width: 45px;
+  height: 45px;
+  border: 5px solid #e0e0e0;
+  border-top: 5px solid #0b3954;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 500px) {
+  .app-actions {
+    flex-direction: column;
+  }
 }

@@ -16,15 +16,21 @@ export default function Investors() {
   const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("name");
+  const [filter, setFilter] = useState("active"); // active or archived
   const toast = useToast();
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [filter]);
 
   const fetchAll = async () => {
     setLoading(true);
     try {
       const res = await api.get("/investors");
-      setList(res.data.data ?? res.data);
+      const data = res.data.data ?? res.data;
+      setList(
+        data.filter(inv =>
+          filter === "archived" ? inv.archived === 1 : inv.archived === 0
+        )
+      );
     } catch (err) {
       console.error(err);
       toast({ title: "Failed to fetch investors.", status: "error" });
@@ -57,17 +63,38 @@ export default function Investors() {
 
   const handleEdit = (inv) => {
     setEditing(inv.id);
-    setForm({ name: inv.name, email: inv.email, phone: inv.phone || "", company: inv.company || "", investment: inv.investment || "" });
+    setForm({
+      name: inv.name,
+      email: inv.email,
+      phone: inv.phone || "",
+      company: inv.company || "",
+      investment: inv.investment || ""
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this investor?")) return;
+  const handleArchive = async (id) => {
+    if (!window.confirm("Archive this investor?")) return;
     try {
-      await api.delete(`/investors/${id}`);
-      toast({ title: "Investor deleted", status: "success" });
+      await api.post(`/investors/${id}/archive`);
+      toast({ title: "Investor archived", status: "success" });
       fetchAll();
-    } catch (err) { console.error(err); toast({ title: "Delete failed", status: "error" }); }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Archive failed", status: "error" });
+    }
+  };
+
+  const handleRestore = async (id) => {
+    if (!window.confirm("Restore this investor?")) return;
+    try {
+      await api.post(`/investors/${id}/restore`);
+      toast({ title: "Investor restored", status: "success" });
+      fetchAll();
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Restore failed", status: "error" });
+    }
   };
 
   const handleExport = () => {
@@ -90,10 +117,33 @@ export default function Investors() {
     <Box p={6} maxW="1200px" mx="auto">
       <Heading mb={6} color="blue.800">Investors</Heading>
 
-      {/* Search, sort, export */}
+      {/* Search, filter, sort, export */}
       <HStack mb={6} spacing={4} flexWrap="wrap">
-        <Input placeholder="Search by name or company" value={search} onChange={e => setSearch(e.target.value)} maxW="300px" borderWidth={2} borderColor="blue.300" />
-        <Select value={sortField} onChange={e => setSortField(e.target.value)} maxW="200px" borderWidth={2} borderColor="blue.300">
+        <Input
+          placeholder="Search by name or company"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          maxW="300px"
+          borderWidth={2}
+          borderColor="blue.300"
+        />
+        <Select
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          maxW="200px"
+          borderWidth={2}
+          borderColor="blue.300"
+        >
+          <option value="active">Active Investors</option>
+          <option value="archived">Archived Investors</option>
+        </Select>
+        <Select
+          value={sortField}
+          onChange={e => setSortField(e.target.value)}
+          maxW="200px"
+          borderWidth={2}
+          borderColor="blue.300"
+        >
           <option value="name">Sort by Name</option>
           <option value="company">Sort by Company</option>
         </Select>
@@ -116,38 +166,41 @@ export default function Investors() {
 
       {loading ? <Spinner size="xl" /> : (
         <MotionBox initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          {/* Desktop Table */}
           <Table variant="simple" mb={4} display={{ base: "none", md: "table" }} borderWidth={2} borderColor="blue.200">
             <Thead bg="blue.800" color="white">
               <Tr>
-                <Th borderColor="blue.300">ID</Th>
-                <Th borderColor="blue.300">Name</Th>
-                <Th borderColor="blue.300">Email</Th>
-                <Th borderColor="blue.300">Phone</Th>
-                <Th borderColor="blue.300">Company</Th>
-                <Th borderColor="blue.300">Investment</Th>
-                <Th borderColor="blue.300">Actions</Th>
+                <Th>ID</Th>
+                <Th>Name</Th>
+                <Th>Email</Th>
+                <Th>Phone</Th>
+                <Th>Company</Th>
+                <Th>Investment</Th>
+                <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
               {filteredList.map(inv => (
-                <Tr key={inv.id} borderWidth={1} borderColor="blue.100" _hover={{ bg: "blue.50" }}>
-                  <Td borderColor="blue.200">{inv.id}</Td>
-                  <Td borderColor="blue.200">{inv.name}</Td>
-                  <Td borderColor="blue.200">{inv.email}</Td>
-                  <Td borderColor="blue.200">{inv.phone}</Td>
-                  <Td borderColor="blue.200">{inv.company}</Td>
-                  <Td borderColor="blue.200">{inv.investment}</Td>
-                  <Td borderColor="blue.200">
+                <Tr key={inv.id} _hover={{ bg: "blue.50" }}>
+                  <Td>{inv.id}</Td>
+                  <Td>{inv.name}</Td>
+                  <Td>{inv.email}</Td>
+                  <Td>{inv.phone}</Td>
+                  <Td>{inv.company}</Td>
+                  <Td>{inv.investment}</Td>
+                  <Td>
                     <Button size="sm" colorScheme="cyan" mr={2} onClick={() => handleEdit(inv)}>Edit</Button>
-                    <Button size="sm" colorScheme="red" onClick={() => handleDelete(inv.id)}>Delete</Button>
+                    {filter === "archived" ? (
+                      <Button size="sm" colorScheme="green" onClick={() => handleRestore(inv.id)}>Restore</Button>
+                    ) : (
+                      <Button size="sm" colorScheme="red" onClick={() => handleArchive(inv.id)}>Archive</Button>
+                    )}
                   </Td>
                 </Tr>
               ))}
             </Tbody>
           </Table>
 
-          {/* Mobile Cards */}
+          {/* Mobile cards */}
           <VStack spacing={4} display={{ base: "flex", md: "none" }}>
             {filteredList.map(inv => (
               <Box key={inv.id} p={4} bg="white" shadow="md" borderRadius="md" w="100%" borderWidth={2} borderColor="blue.200">
@@ -159,7 +212,11 @@ export default function Investors() {
                 <Text><strong>Investment:</strong> {inv.investment}</Text>
                 <HStack mt={2}>
                   <Button size="sm" colorScheme="cyan" onClick={() => handleEdit(inv)}>Edit</Button>
-                  <Button size="sm" colorScheme="red" onClick={() => handleDelete(inv.id)}>Delete</Button>
+                  {filter === "archived" ? (
+                    <Button size="sm" colorScheme="green" onClick={() => handleRestore(inv.id)}>Restore</Button>
+                  ) : (
+                    <Button size="sm" colorScheme="red" onClick={() => handleArchive(inv.id)}>Archive</Button>
+                  )}
                 </HStack>
               </Box>
             ))}

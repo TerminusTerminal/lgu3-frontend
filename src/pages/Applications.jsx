@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import "./Applications.css";
 
 export default function Applications() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const r = await api.get("/applications");
-        setList(Array.isArray(r.data.data ?? r.data) ? (r.data.data ?? r.data) : []);
-      } catch (err) {
-        console.error("Failed to load applications", err);
-        setList([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const r = await api.get("/applications");
+      // Filter out archived ones by default
+      const data = Array.isArray(r.data.data ?? r.data)
+        ? r.data.data ?? r.data
+        : [];
+      setList(data.filter((a) => !a.archived)); // exclude archived apps
+    } catch (err) {
+      console.error("Failed to load applications", err);
+      setList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const decide = async (id, action) => {
     try {
@@ -28,52 +36,135 @@ export default function Applications() {
         action,
         remarks: action === "approve" ? "Approved" : "Rejected",
       });
-      const r = await api.get("/applications");
-      setList(r.data.data ?? r.data);
+      fetchData();
     } catch (err) {
       console.error("Failed to decide", err);
     }
   };
 
-  if (loading) return <div className="page"><p>Loading applications...</p></div>;
-  if (!list.length) return <div className="page"><p>No applications found.</p></div>;
+  const archiveApplication = async (id) => {
+    if (!window.confirm("Are you sure you want to archive this application?")) return;
+    try {
+      await api.post(`/applications/${id}/archive`);
+      fetchData();
+    } catch (err) {
+      console.error("Failed to archive application", err);
+    }
+  };
+
+  const restoreApplication = async (id) => {
+    try {
+      await api.post(`/applications/${id}/restore`);
+      setSelectedApp(null);
+      fetchData();
+    } catch (err) {
+      console.error("Failed to restore application", err);
+    }
+  };
+
+  const statusClass = (status) => {
+    switch (status) {
+      case "approved":
+        return "status approved";
+      case "rejected":
+        return "status rejected";
+      default:
+        return "status pending";
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="page">
+        <div className="loading-spinner"></div>
+        <p>Loading applications...</p>
+      </div>
+    );
 
   return (
     <div className="page">
-      <h2>Applications</h2>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Investor</th>
-            <th>Project</th>
-            <th>Incentive</th>
-            <th>Requested</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.map(a => (
-            <tr key={a.id}>
-              <td>{a.id}</td>
-              <td>{a.investor?.name ?? a.investor_id ?? "-"}</td>
-              <td>{a.project?.name ?? a.project_id ?? "-"}</td>
-              <td>{a.incentive?.title ?? a.incentive_id ?? "-"}</td>
-              <td>{a.requested_amount ?? "-"}</td>
-              <td>{a.status ?? "-"}</td>
-              <td>
+      <div className="page-header">
+        <h2>Applications</h2>
+        <button className="new-app-btn" onClick={() => navigate("/applications/new")}>
+          + New Application
+        </button>
+      </div>
+
+      {!list.length ? (
+        <p>No active applications found.</p>
+      ) : (
+        <div className="app-grid">
+          {list.map((a) => (
+            <div className="app-card" key={a.id}>
+              <div className="app-header">
+                <h3>{a.project?.name ?? "Untitled Project"}</h3>
+                <span className={statusClass(a.status)}>{a.status}</span>
+              </div>
+
+              <p>
+                <strong>Investor:</strong> {a.investor?.name ?? "-"}
+              </p>
+              <p>
+                <strong>Incentive:</strong> {a.incentive?.title ?? "-"}
+              </p>
+              <p>
+                <strong>Requested:</strong> ₱{a.requested_amount ?? "-"}
+              </p>
+
+              <div className="app-actions">
                 {a.status === "pending" ? (
                   <>
-                    <button onClick={() => decide(a.id, "approve")}>Approve</button>
-                    <button onClick={() => decide(a.id, "reject")}>Reject</button>
+                    <button className="approve" onClick={() => decide(a.id, "approve")}>
+                      Approve
+                    </button>
+                    <button className="reject" onClick={() => decide(a.id, "reject")}>
+                      Reject
+                    </button>
                   </>
-                ) : "-"}
-              </td>
-            </tr>
+                ) : (
+                  <>
+                    <button className="details" onClick={() => setSelectedApp(a)}>
+                      View Details
+                    </button>
+                    <button className="archive" onClick={() => archiveApplication(a.id)}>
+                      Archive
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      )}
+
+      {selectedApp && (
+        <div className="modal-overlay" onClick={() => setSelectedApp(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Application Details</h3>
+            <p><strong>ID:</strong> {selectedApp.id}</p>
+            <p><strong>Investor:</strong> {selectedApp.investor?.name}</p>
+            <p><strong>Project:</strong> {selectedApp.project?.name}</p>
+            <p><strong>Incentive:</strong> {selectedApp.incentive?.title}</p>
+            <p><strong>Requested Amount:</strong> ₱{selectedApp.requested_amount}</p>
+            <p><strong>Status:</strong> {selectedApp.status}</p>
+            <p><strong>Remarks:</strong> {selectedApp.remarks ?? "N/A"}</p>
+
+            {selectedApp.archived ? (
+              <button className="restore-btn" onClick={() => restoreApplication(selectedApp.id)}>
+                Restore Application
+              </button>
+            ) : (
+              <button className="archive" onClick={() => archiveApplication(selectedApp.id)}>
+                Archive
+              </button>
+            )}
+
+            <button className="close-btn" onClick={() => setSelectedApp(null)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

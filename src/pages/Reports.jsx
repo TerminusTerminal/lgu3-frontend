@@ -3,11 +3,11 @@ import api from "../api";
 import "./Reports.css";
 
 export default function Reports() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
-  const [summaries, setSummaries] = useState({}); // store AI summaries per key
-  const [summarizing, setSummarizing] = useState({}); // track loading per key
+  const [summaries, setSummaries] = useState({});
+  const [summarizing, setSummarizing] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -17,9 +17,10 @@ export default function Reports() {
     setLoading(true);
     try {
       const r = await api.get("/reports/summary");
-      setData(r.data);
+      setData(r.data ?? []);
     } catch (err) {
       console.error(err);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -41,17 +42,11 @@ export default function Reports() {
     }
   };
 
-  const filteredData = data
-    ? Object.keys(data)
-        .filter(key => key.toLowerCase().includes(filter.toLowerCase()))
-        .reduce((obj, key) => {
-          obj[key] = data[key];
-          return obj;
-        }, {})
-    : {};
+  if (loading) return <p className="loading">Loading reports...</p>;
+  if (!data || data.length === 0) return <p className="empty">No report data available.</p>;
 
   return (
-    <div className="page">
+    <div className="page reports-page">
       <h2>Reports</h2>
 
       <div className="reports-actions">
@@ -64,39 +59,47 @@ export default function Reports() {
         <button onClick={fetchData}>Refresh</button>
       </div>
 
-      {loading && <p className="loading">Loading reports...</p>}
-
-      {!loading && data && Object.keys(filteredData).length === 0 && (
-        <p className="empty">No matching reports.</p>
-      )}
-
       <div className="reports-cards">
-        {data &&
-          Object.entries(filteredData).map(([key, value]) => (
-            <div className="report-card" key={key}>
-              <h3>{key.replace(/_/g, " ").toUpperCase()}</h3>
-              {typeof value === "number" || typeof value === "string" ? (
-                <p className="report-value">{value}</p>
-              ) : (
-                <pre className="report-json">{JSON.stringify(value, null, 2)}</pre>
-              )}
+        {Array.isArray(data) ? (
+          data
+            .filter(item => !filter || item.status.toLowerCase().includes(filter.toLowerCase()))
+            .map(item => (
+              <div className="report-card" key={item.status}>
+                <h3>Status Summary</h3>
+                <span className={`status-badge ${item.status.toLowerCase()}`}>
+                  {item.status}: {item.total}
+                </span>
+              </div>
+            ))
+        ) : (
+          Object.entries(data)
+            .filter(([key]) => key.toLowerCase().includes(filter.toLowerCase()))
+            .map(([key, value]) => (
+              <div className="report-card" key={key}>
+                <h3>{key.replace(/_/g, " ").toUpperCase()}</h3>
 
-              <button
-                onClick={() => handleSummarize(key, value)}
-                disabled={summarizing[key]}
-                style={{ marginTop: "8px" }}
-              >
-                {summarizing[key] ? "Summarizing..." : "Summarize"}
-              </button>
+                {typeof value === "object" ? (
+                  <pre className="report-json">{JSON.stringify(value, null, 2)}</pre>
+                ) : (
+                  <p className="report-value">{value}</p>
+                )}
 
-              {summaries[key] && (
-                <div className="report-summary">
-                  <strong>AI Summary:</strong>
-                  <p>{summaries[key]}</p>
-                </div>
-              )}
-            </div>
-          ))}
+                <button
+                  onClick={() => handleSummarize(key, value)}
+                  disabled={summarizing[key]}
+                >
+                  {summarizing[key] ? "Summarizing..." : "Summarize"}
+                </button>
+
+                {summaries[key] && (
+                  <div className="report-summary">
+                    <strong>AI Summary:</strong>
+                    <p>{summaries[key]}</p>
+                  </div>
+                )}
+              </div>
+            ))
+        )}
       </div>
     </div>
   );

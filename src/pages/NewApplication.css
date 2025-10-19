@@ -1,0 +1,129 @@
+.page.new-application {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #222;
+}
+
+.new-application h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #0b3954;
+}
+
+.new-application .form-card {
+  background: #fff;
+  border: 2px solid #0b3954;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.new-application .form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-application label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #083b66;
+}
+
+.new-application select,
+.new-application input {
+  padding: 0.5rem;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.new-application select:focus,
+.new-application input:focus {
+  border-color: #0b3954;
+  outline: none;
+}
+
+.new-application button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #0b3954;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.new-application button:hover {
+  background: #133f63;
+}
+
+.new-application .error-text {
+  color: #b71c1c;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Success Page / Application Submitted --- */
+.submitted-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+.success-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 2rem 3rem;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  animation: popIn 0.4s ease;
+}
+
+.success-card .checkmark {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #27ae60;
+}
+
+.success-card h2 {
+  margin-bottom: 0.5rem;
+  color: #0b3954;
+}
+
+.success-card p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.success-card button {
+  background-color: #27ae60;
+  border: none;
+  color: white;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.success-card button:hover {
+  background-color: #219150;
+}
+
+/* Animations */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
